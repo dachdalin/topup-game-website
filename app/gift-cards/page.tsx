@@ -1,0 +1,301 @@
+"use client";
+
+import { useState } from "react";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Check, Gift, Loader2, Copy, Mail, ArrowLeft } from "lucide-react";
+
+const giftCards = [
+  { id: "google-play", name: "Google Play", color: "from-green-500 to-green-700" },
+  { id: "apple", name: "Apple App Store", color: "from-gray-600 to-gray-800" },
+  { id: "steam", name: "Steam", color: "from-blue-600 to-blue-900" },
+  { id: "garena", name: "Garena", color: "from-orange-500 to-red-600" },
+  { id: "playstation", name: "PlayStation", color: "from-blue-500 to-blue-700" },
+];
+
+const cardValues = [
+  { value: 5, price: 5.49 },
+  { value: 10, price: 10.99 },
+  { value: 25, price: 26.99 },
+  { value: 50, price: 52.99 },
+];
+
+const paymentMethods = [
+  { id: "ewallet", name: "E-Wallet", icon: "💳" },
+  { id: "bank", name: "Bank Transfer", icon: "🏦" },
+  { id: "crypto", name: "Crypto", icon: "₿" },
+];
+
+type Step = "list" | "detail" | "success";
+
+export default function GiftCardsPage() {
+  const [step, setStep] = useState<Step>("list");
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [selectedValue, setSelectedValue] = useState<number | null>(null);
+  const [email, setEmail] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const currentCard = giftCards.find((c) => c.id === selectedCard);
+  const currentValue = cardValues.find((v) => v.value === selectedValue);
+
+  // Generate a fake code for demo
+  const generatedCode = "XXXX-XXXX-XXXX-XXXX";
+
+  const handleSelectCard = (cardId: string) => {
+    setSelectedCard(cardId);
+    setStep("detail");
+  };
+
+  const handleBuyNow = () => {
+    if (!selectedValue || !paymentMethod) return;
+    setIsProcessing(true);
+    setTimeout(() => {
+      setIsProcessing(false);
+      setStep("success");
+    }, 2000);
+  };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(generatedCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleReset = () => {
+    setStep("list");
+    setSelectedCard(null);
+    setSelectedValue(null);
+    setEmail("");
+    setPaymentMethod(null);
+  };
+
+  // Success screen
+  if (step === "success") {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex flex-1 items-center justify-center px-4 py-16">
+          <Card className="w-full max-w-md border-border bg-card">
+            <CardContent className="flex flex-col items-center p-8 text-center">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success/20">
+                <Gift className="h-8 w-8 text-success" />
+              </div>
+              <h2 className="mb-2 text-2xl font-bold text-foreground">Your Gift Card is Ready!</h2>
+              <p className="mb-6 text-muted-foreground">
+                ${selectedValue} {currentCard?.name} Gift Card
+              </p>
+
+              <div className="mb-6 w-full rounded-lg bg-background p-4">
+                <Label className="text-xs text-muted-foreground">Your Code</Label>
+                <div className="mt-2 flex items-center gap-2">
+                  <code className="flex-1 rounded bg-card p-3 text-center font-mono text-lg text-primary">
+                    {generatedCode}
+                  </code>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleCopyCode}
+                    className="border-primary/50 text-primary hover:bg-primary/10 bg-transparent"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              {email && (
+                <p className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+                  <Mail className="h-4 w-4" />
+                  Code also sent to {email}
+                </p>
+              )}
+
+              <Button
+                onClick={handleReset}
+                className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground"
+              >
+                Buy Another Gift Card
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Detail screen
+  if (step === "detail" && currentCard) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1 py-8">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            <Button
+              variant="ghost"
+              onClick={() => setStep("list")}
+              className="mb-6 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Gift Cards
+            </Button>
+
+            <div className="grid gap-8 lg:grid-cols-2">
+              {/* Left - Card Preview */}
+              <div>
+                <Card className={`overflow-hidden border-0 bg-gradient-to-br ${currentCard.color}`}>
+                  <CardContent className="flex h-48 flex-col items-center justify-center p-6 text-white">
+                    <Gift className="mb-4 h-12 w-12" />
+                    <h2 className="text-2xl font-bold">{currentCard.name}</h2>
+                    <p className="mt-2 text-white/80">Gift Card</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right - Purchase Form */}
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground">{currentCard.name} Gift Card</h1>
+                  <p className="mt-1 text-muted-foreground">Instant delivery to your email</p>
+                </div>
+
+                {/* Value Selection */}
+                <div className="space-y-3">
+                  <Label className="text-foreground">Select Value</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {cardValues.map((v) => (
+                      <button
+                        key={v.value}
+                        type="button"
+                        onClick={() => setSelectedValue(v.value)}
+                        className={`relative rounded-xl border-2 p-4 text-left transition-all ${
+                          selectedValue === v.value
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-card hover:border-primary/50"
+                        }`}
+                      >
+                        {selectedValue === v.value && (
+                          <div className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary">
+                            <Check className="h-3 w-3 text-primary-foreground" />
+                          </div>
+                        )}
+                        <div className="text-xl font-bold text-foreground">${v.value}</div>
+                        <div className="mt-1 text-sm text-muted-foreground">
+                          ${v.price.toFixed(2)}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Email Input */}
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-foreground">Email (Optional)</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter email to receive code"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="border-border bg-background text-foreground placeholder:text-muted-foreground"
+                  />
+                </div>
+
+                {/* Payment Method */}
+                <div className="space-y-3">
+                  <Label className="text-foreground">Payment Method</Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    {paymentMethods.map((method) => (
+                      <button
+                        key={method.id}
+                        type="button"
+                        onClick={() => setPaymentMethod(method.id)}
+                        className={`rounded-xl border-2 p-3 text-center transition-all ${
+                          paymentMethod === method.id
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-card hover:border-primary/50"
+                        }`}
+                      >
+                        <div className="text-xl">{method.icon}</div>
+                        <div className="mt-1 text-xs font-medium text-foreground">{method.name}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Buy Button */}
+                <Button
+                  onClick={handleBuyNow}
+                  disabled={!selectedValue || !paymentMethod || isProcessing}
+                  className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground transition-all hover:scale-105 hover:shadow-lg hover:shadow-primary/25 disabled:scale-100 disabled:opacity-50"
+                  size="lg"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>Buy Now {currentValue ? `- $${currentValue.price.toFixed(2)}` : ""}</>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // List screen
+  return (
+    <div className="flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1 py-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-foreground">Gift Cards</h1>
+            <p className="mt-2 text-muted-foreground">
+              Buy gift cards instantly and receive your code right away
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {giftCards.map((card) => (
+              <Card
+                key={card.id}
+                id={card.id}
+                className="group cursor-pointer overflow-hidden border-border bg-card transition-all hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10"
+                onClick={() => handleSelectCard(card.id)}
+              >
+                <div className={`h-32 bg-gradient-to-br ${card.color}`}>
+                  <div className="flex h-full items-center justify-center">
+                    <Gift className="h-12 w-12 text-white/80 transition-transform group-hover:scale-110" />
+                  </div>
+                </div>
+                <CardContent className="p-4">
+                  <h3 className="text-lg font-semibold text-foreground group-hover:text-primary">
+                    {card.name}
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">From $5 - $50</p>
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                      Instant Delivery
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
+}

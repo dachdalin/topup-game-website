@@ -5,7 +5,7 @@ This is a web application for a game top-up service, built using the Next.js fra
 ## Project Structure
 
 ```
-/var/www/html/topup-game-website/
+/topup-game-website/
 ├───.gitignore
 ├───components.json
 ├───next.config.mjs

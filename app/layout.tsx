@@ -10,7 +10,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: 'GameTopUp - Instant PUBG & MLBB Top-Up',
   description: 'Fast, safe, and secure game top-up for PUBG Mobile UC and Mobile Legends Diamonds. No login required. Instant delivery.',
-  generator: 'v0.app',
+  generator: 'www.dachdalin.dev',
   icons: {
     icon: [
       {

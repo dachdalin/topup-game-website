@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertCircle, Check, Zap, Loader2 } from "lucide-react";
+import { AlertCircle, Check, Zap, Loader2, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
 
 const ucPackages = [
   { amount: 60, price: 0.99 },
@@ -26,10 +27,10 @@ const ucPackages = [
 ];
 
 const paymentMethods = [
-  { id: "aba", name: "ABA PAY", hint: "Mobile app" },
-  { id: "wing", name: "Wing", hint: "Mobile money" },
-  { id: "khqr", name: "KHQR", hint: "Scan any bank" },
-  { id: "truemoney", name: "TrueMoney", hint: "Wallet" },
+  { id: "aba", name: "ABA PAY", hint: "Mobile app", icon: Smartphone },
+  { id: "wing", name: "Wing", hint: "Mobile money", icon: Wallet },
+  { id: "khqr", name: "KHQR", hint: "Scan any bank", icon: QrCode },
+  { id: "truemoney", name: "TrueMoney", hint: "Wallet", icon: CreditCard },
 ];
 
 type Step = "select" | "payment" | "success";
@@ -39,13 +40,14 @@ export default function PubgPage() {
   const [server, setServer] = useState("global");
   const [selectedPackage, setSelectedPackage] = useState<number | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [step, setStep] = useState<Step>("select");
   const [isProcessing, setIsProcessing] = useState(false);
 
   const selectedPkg = ucPackages.find((pkg) => pkg.amount === selectedPackage);
 
   const handleConfirmPayment = () => {
-    if (!playerId || !selectedPackage || !paymentMethod) return;
+    if (!playerId || !selectedPackage || !paymentMethod || !agreedToTerms) return;
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
@@ -58,6 +60,7 @@ export default function PubgPage() {
     setServer("global");
     setSelectedPackage(null);
     setPaymentMethod(null);
+    setAgreedToTerms(false);
     setStep("select");
   };
 
@@ -212,23 +215,72 @@ export default function PubgPage() {
                 <CardHeader>
                   <CardTitle className="text-lg text-foreground">Payment Method</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                    {paymentMethods.map((method) => (
+                <CardContent className="space-y-3">
+                  {paymentMethods.map((method) => {
+                    const isSelected = paymentMethod === method.id;
+                    return (
                       <button
                         key={method.id}
                         type="button"
                         onClick={() => setPaymentMethod(method.id)}
-                        className={`rounded-xl border-2 p-4 text-center transition-all ${
-                          paymentMethod === method.id
+                        className={`flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left transition-all ${
+                          isSelected
                             ? "border-primary bg-primary/10"
                             : "border-border bg-background hover:border-primary/50"
                         }`}
                       >
-                        <div className="font-mono text-sm font-semibold text-foreground">{method.name}</div>
-                        <div className="mt-1 text-xs text-muted-foreground">{method.hint}</div>
+                        <span
+                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                            isSelected ? "border-primary" : "border-border"
+                          }`}
+                        >
+                          {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
+                        </span>
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <method.icon className="h-5 w-5" />
+                        </span>
+                        <span className="flex-1">
+                          <span className="block font-semibold text-foreground">{method.name}</span>
+                          <span className="block text-sm text-muted-foreground">{method.hint}</span>
+                        </span>
                       </button>
-                    ))}
+                    );
+                  })}
+
+                  <div
+                    role="checkbox"
+                    aria-checked={agreedToTerms}
+                    tabIndex={0}
+                    onClick={() => setAgreedToTerms((v) => !v)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setAgreedToTerms((v) => !v);
+                      }
+                    }}
+                    className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-all ${
+                      agreedToTerms
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-background hover:border-primary/50"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                        agreedToTerms ? "border-primary" : "border-border"
+                      }`}
+                    >
+                      {agreedToTerms && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
+                    </span>
+                    <span className="text-sm text-foreground">
+                      I have read and agree to the{" "}
+                      <Link
+                        href="/terms"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-primary underline"
+                      >
+                        Terms & Conditions
+                      </Link>
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -273,7 +325,7 @@ export default function PubgPage() {
                   </div>
                   <Button
                     onClick={handleConfirmPayment}
-                    disabled={!playerId || !selectedPackage || !paymentMethod || isProcessing}
+                    disabled={!playerId || !selectedPackage || !paymentMethod || !agreedToTerms || isProcessing}
                     className="w-full bg-primary text-primary-foreground transition-all hover:scale-105 hover:bg-primary/90 disabled:scale-100 disabled:opacity-50"
                   >
                     {isProcessing ? (

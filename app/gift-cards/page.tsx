@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, Gift, Loader2, Copy, Mail, ArrowLeft } from "lucide-react";
+import { Check, Gift, Loader2, Copy, Mail, ArrowLeft, Wallet, Landmark, Bitcoin } from "lucide-react";
 
 const giftCards = [
   { id: "google-play", name: "Google Play", color: "from-green-500 to-green-700" },
@@ -25,9 +26,9 @@ const cardValues = [
 ];
 
 const paymentMethods = [
-  { id: "ewallet", name: "E-Wallet", icon: "💳" },
-  { id: "bank", name: "Bank Transfer", icon: "🏦" },
-  { id: "crypto", name: "Crypto", icon: "₿" },
+  { id: "ewallet", name: "E-Wallet", hint: "Pay from your wallet balance", icon: Wallet },
+  { id: "bank", name: "Bank Transfer", hint: "Direct transfer from your bank", icon: Landmark },
+  { id: "crypto", name: "Crypto", hint: "Pay with cryptocurrency", icon: Bitcoin },
 ];
 
 type Step = "list" | "detail" | "success";
@@ -38,6 +39,7 @@ export default function GiftCardsPage() {
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
   const [email, setEmail] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -53,7 +55,7 @@ export default function GiftCardsPage() {
   };
 
   const handleBuyNow = () => {
-    if (!selectedValue || !paymentMethod) return;
+    if (!selectedValue || !paymentMethod || !agreedToTerms) return;
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
@@ -73,6 +75,7 @@ export default function GiftCardsPage() {
     setSelectedValue(null);
     setEmail("");
     setPaymentMethod(null);
+    setAgreedToTerms(false);
   };
 
   // Success screen
@@ -209,29 +212,78 @@ export default function GiftCardsPage() {
                 {/* Payment Method */}
                 <div className="space-y-3">
                   <Label className="text-foreground">Payment Method</Label>
-                  <div className="grid grid-cols-3 gap-3">
-                    {paymentMethods.map((method) => (
+                  {paymentMethods.map((method) => {
+                    const isSelected = paymentMethod === method.id;
+                    return (
                       <button
                         key={method.id}
                         type="button"
                         onClick={() => setPaymentMethod(method.id)}
-                        className={`rounded-xl border-2 p-3 text-center transition-all ${
-                          paymentMethod === method.id
+                        className={`flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left transition-all ${
+                          isSelected
                             ? "border-primary bg-primary/10"
                             : "border-border bg-card hover:border-primary/50"
                         }`}
                       >
-                        <div className="text-xl">{method.icon}</div>
-                        <div className="mt-1 text-xs font-medium text-foreground">{method.name}</div>
+                        <span
+                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                            isSelected ? "border-primary" : "border-border"
+                          }`}
+                        >
+                          {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
+                        </span>
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <method.icon className="h-5 w-5" />
+                        </span>
+                        <span className="flex-1">
+                          <span className="block font-semibold text-foreground">{method.name}</span>
+                          <span className="block text-sm text-muted-foreground">{method.hint}</span>
+                        </span>
                       </button>
-                    ))}
+                    );
+                  })}
+
+                  <div
+                    role="checkbox"
+                    aria-checked={agreedToTerms}
+                    tabIndex={0}
+                    onClick={() => setAgreedToTerms((v) => !v)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setAgreedToTerms((v) => !v);
+                      }
+                    }}
+                    className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-all ${
+                      agreedToTerms
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-card hover:border-primary/50"
+                    }`}
+                  >
+                    <span
+                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                        agreedToTerms ? "border-primary" : "border-border"
+                      }`}
+                    >
+                      {agreedToTerms && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
+                    </span>
+                    <span className="text-sm text-foreground">
+                      I have read and agree to the{" "}
+                      <Link
+                        href="/terms"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-primary underline"
+                      >
+                        Terms & Conditions
+                      </Link>
+                    </span>
                   </div>
                 </div>
 
                 {/* Buy Button */}
                 <Button
                   onClick={handleBuyNow}
-                  disabled={!selectedValue || !paymentMethod || isProcessing}
+                  disabled={!selectedValue || !paymentMethod || !agreedToTerms || isProcessing}
                   className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground transition-all hover:scale-105 hover:shadow-lg hover:shadow-primary/25 disabled:scale-100 disabled:opacity-50"
                   size="lg"
                 >

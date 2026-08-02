@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Check, Loader2, Gem, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
+import { AlertCircle, Check, Loader2, Gem, Search, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
 
 const diamondPackages = [
   { amount: 86, price: 1.49 },
@@ -27,6 +27,7 @@ const paymentMethods = [
 ];
 
 type Step = "select" | "payment" | "success";
+type IdCheckStatus = "idle" | "checking" | "done" | "error";
 
 export default function MlbbPage() {
   const [userId, setUserId] = useState("");
@@ -36,8 +37,43 @@ export default function MlbbPage() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [step, setStep] = useState<Step>("select");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [idCheckStatus, setIdCheckStatus] = useState<IdCheckStatus>("idle");
+  const [checkedNickname, setCheckedNickname] = useState<string | null>(null);
 
   const selectedPkg = diamondPackages.find((pkg) => pkg.amount === selectedPackage);
+
+  const fullPlayerId = userId && serverId ? `${userId}(${serverId})` : "";
+
+  const handleCheckPlayerId = async () => {
+    if (!fullPlayerId || idCheckStatus === "checking") return;
+    setIdCheckStatus("checking");
+    setCheckedNickname(null);
+    try {
+      const res = await fetch("/api/check-player-id", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId: fullPlayerId }),
+      });
+      if (!res.ok) throw new Error("lookup failed");
+      const data = await res.json();
+      setCheckedNickname(data.nickname);
+      setIdCheckStatus("done");
+    } catch {
+      setIdCheckStatus("error");
+    }
+  };
+
+  const handleUserIdChange = (value: string) => {
+    setUserId(value);
+    setIdCheckStatus("idle");
+    setCheckedNickname(null);
+  };
+
+  const handleServerIdChange = (value: string) => {
+    setServerId(value);
+    setIdCheckStatus("idle");
+    setCheckedNickname(null);
+  };
 
   const handleConfirmPayment = () => {
     if (!userId || !serverId || !selectedPackage || !paymentMethod || !agreedToTerms) return;
@@ -54,10 +90,10 @@ export default function MlbbPage() {
     setSelectedPackage(null);
     setPaymentMethod(null);
     setAgreedToTerms(false);
+    setIdCheckStatus("idle");
+    setCheckedNickname(null);
     setStep("select");
   };
-
-  const fullPlayerId = userId && serverId ? `${userId}(${serverId})` : "";
 
   if (step === "success") {
     return (
@@ -137,7 +173,7 @@ export default function MlbbPage() {
                         id="userId"
                         placeholder="Enter your User ID"
                         value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
+                        onChange={(e) => handleUserIdChange(e.target.value)}
                         className="border-border bg-background text-foreground placeholder:text-muted-foreground"
                       />
                     </div>
@@ -147,16 +183,52 @@ export default function MlbbPage() {
                         id="serverId"
                         placeholder="Enter Server ID"
                         value={serverId}
-                        onChange={(e) => setServerId(e.target.value)}
+                        onChange={(e) => handleServerIdChange(e.target.value)}
                         className="border-border bg-background text-foreground placeholder:text-muted-foreground"
                       />
                     </div>
                   </div>
+
                   {fullPlayerId && (
-                    <p className="text-sm text-primary">
-                      Your Player ID: <span className="font-medium">{fullPlayerId}</span>
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm text-primary">
+                        Your Player ID: <span className="font-medium">{fullPlayerId}</span>
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleCheckPlayerId}
+                        disabled={idCheckStatus === "checking"}
+                        className="shrink-0 border-accent text-accent hover:bg-accent/10 bg-transparent"
+                      >
+                        {idCheckStatus === "checking" ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Search className="h-4 w-4" />
+                        )}
+                        <span className="ml-2 hidden sm:inline">Check ID</span>
+                      </Button>
+                    </div>
+                  )}
+
+                  {idCheckStatus === "done" && checkedNickname && (
+                    <div className="rounded-lg border-2 border-accent/50 bg-accent/10 p-3">
+                      <p className="text-sm text-foreground">
+                        Account found: <span className="font-semibold">{checkedNickname}</span>
+                      </p>
+                      <p className="mt-1 flex items-center gap-1 text-xs text-accent">
+                        <AlertCircle className="h-3 w-3 shrink-0" />
+                        Preview lookup only — not yet verified against the live game server. Confirm your User ID and Server ID match your in-game profile before paying.
+                      </p>
+                    </div>
+                  )}
+                  {idCheckStatus === "error" && (
+                    <p className="flex items-center gap-1 text-xs text-destructive">
+                      <AlertCircle className="h-3 w-3" />
+                      Could not check this ID right now. Double-check it manually before paying.
                     </p>
                   )}
+
                   <p className="flex items-center gap-1 text-xs text-muted-foreground">
                     <AlertCircle className="h-3 w-3" />
                     Example: 12345678(1234) - Double-check before payment

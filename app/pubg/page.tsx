@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertCircle, Check, Coins, Loader2, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
+import { AlertCircle, Check, Coins, Loader2, Search, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
 
 const ucPackages = [
   { amount: 60, price: 0.99 },
@@ -34,6 +34,7 @@ const paymentMethods = [
 ];
 
 type Step = "select" | "payment" | "success";
+type IdCheckStatus = "idle" | "checking" | "done" | "error";
 
 export default function PubgPage() {
   const [playerId, setPlayerId] = useState("");
@@ -43,8 +44,35 @@ export default function PubgPage() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [step, setStep] = useState<Step>("select");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [idCheckStatus, setIdCheckStatus] = useState<IdCheckStatus>("idle");
+  const [checkedNickname, setCheckedNickname] = useState<string | null>(null);
 
   const selectedPkg = ucPackages.find((pkg) => pkg.amount === selectedPackage);
+
+  const handleCheckPlayerId = async () => {
+    if (!playerId.trim() || idCheckStatus === "checking") return;
+    setIdCheckStatus("checking");
+    setCheckedNickname(null);
+    try {
+      const res = await fetch("/api/check-player-id", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ playerId, server }),
+      });
+      if (!res.ok) throw new Error("lookup failed");
+      const data = await res.json();
+      setCheckedNickname(data.nickname);
+      setIdCheckStatus("done");
+    } catch {
+      setIdCheckStatus("error");
+    }
+  };
+
+  const handlePlayerIdChange = (value: string) => {
+    setPlayerId(value);
+    setIdCheckStatus("idle");
+    setCheckedNickname(null);
+  };
 
   const handleConfirmPayment = () => {
     if (!playerId || !selectedPackage || !paymentMethod || !agreedToTerms) return;
@@ -61,6 +89,8 @@ export default function PubgPage() {
     setSelectedPackage(null);
     setPaymentMethod(null);
     setAgreedToTerms(false);
+    setIdCheckStatus("idle");
+    setCheckedNickname(null);
     setStep("select");
   };
 
@@ -137,13 +167,47 @@ export default function PubgPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="playerId" className="text-foreground">Player ID</Label>
-                    <Input
-                      id="playerId"
-                      placeholder="Enter your Player ID"
-                      value={playerId}
-                      onChange={(e) => setPlayerId(e.target.value)}
-                      className="border-border bg-background text-foreground placeholder:text-muted-foreground"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="playerId"
+                        placeholder="Enter your Player ID"
+                        value={playerId}
+                        onChange={(e) => handlePlayerIdChange(e.target.value)}
+                        className="border-border bg-background text-foreground placeholder:text-muted-foreground"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleCheckPlayerId}
+                        disabled={!playerId.trim() || idCheckStatus === "checking"}
+                        className="shrink-0 border-accent text-accent hover:bg-accent/10 bg-transparent"
+                      >
+                        {idCheckStatus === "checking" ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Search className="h-4 w-4" />
+                        )}
+                        <span className="ml-2 hidden sm:inline">Check ID</span>
+                      </Button>
+                    </div>
+
+                    {idCheckStatus === "done" && checkedNickname && (
+                      <div className="rounded-lg border-2 border-accent/50 bg-accent/10 p-3">
+                        <p className="text-sm text-foreground">
+                          Account found: <span className="font-semibold">{checkedNickname}</span>
+                        </p>
+                        <p className="mt-1 flex items-center gap-1 text-xs text-accent">
+                          <AlertCircle className="h-3 w-3 shrink-0" />
+                          Preview lookup only — not yet verified against the live game server. Confirm your Player ID matches your in-game profile before paying.
+                        </p>
+                      </div>
+                    )}
+                    {idCheckStatus === "error" && (
+                      <p className="flex items-center gap-1 text-xs text-destructive">
+                        <AlertCircle className="h-3 w-3" />
+                        Could not check this ID right now. Double-check it manually before paying.
+                      </p>
+                    )}
                     <p className="flex items-center gap-1 text-xs text-muted-foreground">
                       <AlertCircle className="h-3 w-3" />
                       Double-check your Player ID before payment

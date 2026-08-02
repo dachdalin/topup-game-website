@@ -15,13 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertCircle, Check, Zap, Loader2, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
+import { AlertCircle, Check, Coins, Loader2, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
 
 const ucPackages = [
   { amount: 60, price: 0.99 },
   { amount: 120, price: 1.99 },
   { amount: 300, price: 4.99 },
-  { amount: 600, price: 9.99 },
+  { amount: 600, price: 9.99, popular: true },
   { amount: 1500, price: 24.99 },
   { amount: 3000, price: 49.99 },
 ];
@@ -179,29 +179,42 @@ export default function PubgPage() {
                           key={pkg.amount}
                           type="button"
                           onClick={() => setSelectedPackage(pkg.amount)}
-                          className={`group flex overflow-hidden rounded-lg border-2 text-left transition-all ${
+                          className={`group relative flex flex-col items-center gap-1.5 rounded-xl border-2 p-4 pt-5 text-center shadow-md transition-all active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
                             isSelected
-                              ? "border-primary bg-primary/10"
-                              : "border-border bg-background hover:border-primary/50"
+                              ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
+                              : pkg.popular
+                                ? "border-accent/60 bg-background shadow-black/20 hover:-translate-y-0.5 hover:border-accent hover:shadow-lg"
+                                : "border-border bg-background shadow-black/20 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg"
                           }`}
                         >
-                          <div className="flex-1 p-4">
-                            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                              UC-{pkg.amount}
-                            </div>
-                            <div className="mt-1 font-display text-xl font-bold text-foreground">
-                              {pkg.amount} UC
-                            </div>
-                            <div className="mt-1 font-mono text-lg font-semibold text-primary">
-                              ${pkg.price.toFixed(2)}
-                            </div>
-                          </div>
-                          <div
-                            className={`scratch-foil flex w-10 shrink-0 items-center justify-center border-l-2 border-dashed ${
-                              isSelected ? "border-primary bg-primary/20 text-primary" : "border-border text-muted-foreground"
+                          {pkg.popular && !isSelected && (
+                            <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rotate-[-2deg] whitespace-nowrap rounded-full bg-accent px-2.5 py-0.5 font-khmer text-[9px] tracking-wide text-accent-foreground shadow">
+                              ពេញនិយម · popular
+                            </span>
+                          )}
+                          {isSelected && (
+                            <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
+                              <Check className="h-3 w-3" />
+                            </span>
+                          )}
+                          <span
+                            className={`flex h-14 w-14 items-center justify-center rounded-full border-4 shadow-inner transition-colors ${
+                              isSelected ? "border-accent bg-accent/20" : "border-accent/50 bg-accent/10 group-hover:border-accent"
                             }`}
                           >
-                            {isSelected ? <Check className="h-4 w-4" /> : <Zap className="h-4 w-4" />}
+                            <Coins className="h-7 w-7 text-accent" />
+                          </span>
+                          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                            UC-{pkg.amount}
+                          </div>
+                          <div className="font-display text-xl font-bold text-foreground">
+                            {pkg.amount} UC
+                          </div>
+                          <div className="font-mono text-lg font-semibold text-primary">
+                            ${pkg.price.toFixed(2)}
+                          </div>
+                          <div className="font-khmer text-[10px] tracking-wide text-muted-foreground">
+                            ភ្លាមៗ · instant
                           </div>
                         </button>
                       );

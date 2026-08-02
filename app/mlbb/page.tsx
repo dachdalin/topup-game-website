@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Check, Zap, Loader2, Gem, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
+import { AlertCircle, Check, Loader2, Gem, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
 
 const diamondPackages = [
   { amount: 86, price: 1.49 },
@@ -170,7 +170,7 @@ export default function MlbbPage() {
                   <CardTitle className="text-lg text-foreground">Select Diamond Package</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {diamondPackages.map((pkg) => {
                       const isSelected = selectedPackage === pkg.amount;
                       return (
@@ -178,30 +178,35 @@ export default function MlbbPage() {
                           key={pkg.amount}
                           type="button"
                           onClick={() => setSelectedPackage(pkg.amount)}
-                          className={`group flex overflow-hidden rounded-lg border-2 text-left transition-all ${
+                          className={`group relative flex flex-col items-center gap-1 rounded-xl border-2 p-3 text-center shadow-md transition-all ${
                             isSelected
-                              ? "border-primary bg-primary/10"
-                              : "border-border bg-background hover:border-primary/50"
+                              ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
+                              : "border-border bg-background shadow-black/20 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg"
                           }`}
                         >
-                          <div className="flex-1 p-4">
-                            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                              DM-{pkg.amount}
-                            </div>
-                            <div className="mt-1 flex items-center gap-1 font-display text-xl font-bold text-foreground">
-                              <Gem className="h-5 w-5 text-accent" />
-                              {pkg.amount}
-                            </div>
-                            <div className="mt-1 font-mono text-lg font-semibold text-primary">
-                              ${pkg.price.toFixed(2)}
-                            </div>
-                          </div>
-                          <div
-                            className={`scratch-foil flex w-10 shrink-0 items-center justify-center border-l-2 border-dashed ${
-                              isSelected ? "border-primary bg-primary/20 text-primary" : "border-border text-muted-foreground"
+                          {isSelected && (
+                            <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
+                              <Check className="h-2.5 w-2.5" />
+                            </span>
+                          )}
+                          <span
+                            className={`flex h-11 w-11 items-center justify-center rounded-full border-4 shadow-inner transition-colors ${
+                              isSelected ? "border-accent bg-accent/20" : "border-accent/50 bg-accent/10 group-hover:border-accent"
                             }`}
                           >
-                            {isSelected ? <Check className="h-4 w-4" /> : <Zap className="h-4 w-4" />}
+                            <Gem className="h-5 w-5 text-accent" />
+                          </span>
+                          <div className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                            DM-{pkg.amount}
+                          </div>
+                          <div className="font-display text-base font-bold text-foreground">
+                            {pkg.amount}
+                          </div>
+                          <div className="font-mono text-sm font-semibold text-primary">
+                            ${pkg.price.toFixed(2)}
+                          </div>
+                          <div className="font-khmer text-[9px] tracking-wide text-muted-foreground">
+                            ភ្លាមៗ · instant
                           </div>
                         </button>
                       );

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Gamepad2 } from "lucide-react";
 
+const paymentRails = ["ABA PAY", "Wing", "KHQR", "TrueMoney"];
+
 export function Footer() {
   return (
     <footer className="border-t border-border bg-card">
@@ -10,11 +12,23 @@ export function Footer() {
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2">
               <Gamepad2 className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold text-foreground">GameTopUp</span>
+              <span className="font-display text-xl font-bold text-foreground">
+                GameTopUp<span className="text-primary">KH</span>
+              </span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              Fast, safe, and secure game top-up service. No login required.
+              Fast, safe game top-up for Cambodia. No login required.
             </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {paymentRails.map((rail) => (
+                <span
+                  key={rail}
+                  className="rounded-md border border-border bg-background px-2 py-1 font-mono text-[11px] tracking-wide text-muted-foreground"
+                >
+                  {rail}
+                </span>
+              ))}
+            </div>
           </div>
 
           {/* Quick Links */}
@@ -81,8 +95,8 @@ export function Footer() {
 
         <div className="mt-8 border-t border-border pt-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} GameTopUp. All rights reserved.
+            <p className="font-mono text-xs text-muted-foreground">
+              © {new Date().getFullYear()} GameTopUpKH · Phnom Penh, Cambodia
             </p>
             <div className="flex items-center gap-4">
               <a

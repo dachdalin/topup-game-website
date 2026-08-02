@@ -3,87 +3,53 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Gaming Top-Up Dark Theme */
+/* Stone Dusk theme — laterite red, Bakong gold, jade, on warm dark stone.
+   Grounded in Cambodian street top-up cards + temple materials, not a stock dark-gaming palette. */
 :root {
-  --background: #0F172A;
-  --foreground: #F9FAFB;
-  --card: #1F2937;
-  --card-foreground: #F9FAFB;
-  --popover: #1F2937;
-  --popover-foreground: #F9FAFB;
-  --primary: #38BDF8;
-  --primary-foreground: #0F172A;
-  --secondary: #1F2937;
-  --secondary-foreground: #F9FAFB;
-  --muted: #374151;
-  --muted-foreground: #9CA3AF;
-  --accent: #6366F1;
-  --accent-foreground: #F9FAFB;
-  --destructive: #EF4444;
-  --destructive-foreground: #F9FAFB;
-  --success: #22C55E;
-  --success-foreground: #0F172A;
-  --border: #374151;
-  --input: #374151;
-  --ring: #38BDF8;
-  --chart-1: #38BDF8;
-  --chart-2: #6366F1;
-  --chart-3: #22C55E;
-  --chart-4: #F59E0B;
-  --chart-5: #EF4444;
-  --radius: 0.75rem;
-  --sidebar: oklch(0.205 0 0); /* Added from default */
-  --sidebar-foreground: oklch(0.985 0 0); /* Added from default */
-  --sidebar-primary: oklch(0.488 0.243 264.376); /* Added from default */
-  --sidebar-primary-foreground: oklch(0.985 0 0); /* Added from default */
-  --sidebar-accent: oklch(0.269 0 0); /* Added from default */
-  --sidebar-accent-foreground: oklch(0.985 0 0); /* Added from default */
-  --sidebar-border: oklch(0.269 0 0); /* Added from default */
-  --sidebar-ring: oklch(0.439 0 0); /* Added from default */
-}
-
-/* Shadcn default light mode (will be overridden by .dark if present and user's :root for dark theme) */
-/* The user's :root is their intended dark theme, so we'll treat this as the light theme */
-.light {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  /* The radius from existing :root takes precedence */
-  --radius: 0.75rem; 
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: #241611;
+  --foreground: #F3E9DA;
+  --card: #2E1D15;
+  --card-foreground: #F3E9DA;
+  --popover: #2E1D15;
+  --popover-foreground: #F3E9DA;
+  --primary: #C1441E;
+  --primary-foreground: #FDF3E7;
+  --secondary: #34231A;
+  --secondary-foreground: #F3E9DA;
+  --muted: #3A281E;
+  --muted-foreground: #C9B29C;
+  --accent: #E4A72E;
+  --accent-foreground: #241611;
+  --destructive: #D64545;
+  --destructive-foreground: #FDF3E7;
+  --success: #2F9E68;
+  --success-foreground: #F3E9DA;
+  --info: #4E7FC4;
+  --info-foreground: #FDF3E7;
+  --border: #4A3325;
+  --input: #4A3325;
+  --ring: #E4A72E;
+  --chart-1: #C1441E;
+  --chart-2: #E4A72E;
+  --chart-3: #2F9E68;
+  --chart-4: #4E7FC4;
+  --chart-5: #C9B29C;
+  --radius: 0.625rem;
+  --sidebar: #2E1D15;
+  --sidebar-foreground: #F3E9DA;
+  --sidebar-primary: #C1441E;
+  --sidebar-primary-foreground: #FDF3E7;
+  --sidebar-accent: #34231A;
+  --sidebar-accent-foreground: #F3E9DA;
+  --sidebar-border: #4A3325;
+  --sidebar-ring: #E4A72E;
 }
 
 @theme inline {
-  --font-sans: 'Geist', 'Geist Fallback';
-  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
+  --font-sans: var(--font-jakarta), 'Plus Jakarta Sans Fallback';
+  --font-display: var(--font-bricolage), 'Bricolage Grotesque Fallback';
+  --font-mono: var(--font-plex-mono), 'IBM Plex Mono Fallback';
+  --font-khmer: var(--font-koulen), 'Koulen Fallback';
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -102,6 +68,8 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -114,7 +82,6 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  /* Added sidebar variables from diff */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -131,5 +98,32 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Ink-stamp badge: rubber-stamp mark for "paid / confirmed" moments */
+  .stamp {
+    @apply inline-flex items-center gap-1.5 rounded-full border-2 px-3 py-1 font-khmer text-sm uppercase tracking-wide;
+    border-color: currentColor;
+    transform: rotate(-4deg);
+  }
+
+  /* Perforated tear line, like a ticket stub or scratch-card edge */
+  .perforated {
+    background-image: radial-gradient(circle, var(--background) 1.5px, transparent 1.6px);
+    background-size: 10px 10px;
+    background-position: center;
+  }
+
+  /* Scratch-foil corner texture for top-up package cards */
+  .scratch-foil {
+    background-image: repeating-linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--muted-foreground) 35%, transparent) 0px,
+      color-mix(in oklab, var(--muted-foreground) 35%, transparent) 2px,
+      transparent 2px,
+      transparent 6px
+    );
   }
 }

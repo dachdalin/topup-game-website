@@ -1,15 +1,17 @@
 import React from "react"
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Bricolage_Grotesque, Plus_Jakarta_Sans, IBM_Plex_Mono, Koulen } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" });
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-plex-mono" });
+const koulen = Koulen({ subsets: ["khmer", "latin"], weight: "400", variable: "--font-koulen" });
 
 export const metadata: Metadata = {
-  title: 'GameTopUp - Instant PUBG & MLBB Top-Up',
-  description: 'Fast, safe, and secure game top-up for PUBG Mobile UC and Mobile Legends Diamonds. No login required. Instant delivery.',
+  title: 'GameTopUp KH - Instant PUBG & MLBB Top-Up in Cambodia',
+  description: 'Fast, safe game top-up for PUBG Mobile UC and Mobile Legends Diamonds. Pay with ABA PAY, Wing, KHQR or TrueMoney. No login required. Instant delivery.',
   generator: 'www.dachdalin.dev',
   icons: {
     icon: [
@@ -37,7 +39,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
+      <body
+        className={`${bricolage.variable} ${jakarta.variable} ${plexMono.variable} ${koulen.variable} font-sans antialiased`}
+      >
         {children}
         <Analytics />
       </body>

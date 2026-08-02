@@ -26,9 +26,10 @@ const ucPackages = [
 ];
 
 const paymentMethods = [
-  { id: "ewallet", name: "E-Wallet", icon: "💳" },
-  { id: "bank", name: "Bank Transfer", icon: "🏦" },
-  { id: "crypto", name: "Crypto", icon: "₿" },
+  { id: "aba", name: "ABA PAY", hint: "Mobile app" },
+  { id: "wing", name: "Wing", hint: "Mobile money" },
+  { id: "khqr", name: "KHQR", hint: "Scan any bank" },
+  { id: "truemoney", name: "TrueMoney", hint: "Wallet" },
 ];
 
 type Step = "select" | "payment" | "success";
@@ -67,10 +68,11 @@ export default function PubgPage() {
         <main className="flex flex-1 items-center justify-center px-4 py-16">
           <Card className="w-full max-w-md border-border bg-card">
             <CardContent className="flex flex-col items-center p-8 text-center">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-success/20">
-                <Check className="h-8 w-8 text-success" />
+              <div className="stamp mb-6 border-success text-success">
+                <Check className="h-4 w-4" />
+                បង់ រួច · paid
               </div>
-              <h2 className="mb-2 text-2xl font-bold text-foreground">Order Received!</h2>
+              <h2 className="mb-2 font-display text-2xl font-bold text-foreground">Order Received!</h2>
               <p className="mb-6 text-muted-foreground">
                 Your {selectedPackage} UC will be delivered within 5-10 minutes.
               </p>
@@ -98,7 +100,7 @@ export default function PubgPage() {
                   WhatsApp
                 </a>
               </p>
-              <Button onClick={handleReset} className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground">
+              <Button onClick={handleReset} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
                 Make Another Purchase
               </Button>
             </CardContent>
@@ -115,7 +117,7 @@ export default function PubgPage() {
       <main className="flex-1 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">PUBG Mobile UC Top-Up</h1>
+            <h1 className="font-display text-3xl font-bold text-foreground">PUBG Mobile UC Top-Up</h1>
             <p className="mt-2 text-muted-foreground">
               Fast and secure UC delivery to your account
             </p>
@@ -167,32 +169,40 @@ export default function PubgPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                    {ucPackages.map((pkg) => (
-                      <button
-                        key={pkg.amount}
-                        type="button"
-                        onClick={() => setSelectedPackage(pkg.amount)}
-                        className={`relative rounded-xl border-2 p-4 text-left transition-all ${
-                          selectedPackage === pkg.amount
-                            ? "border-primary bg-primary/10"
-                            : "border-border bg-background hover:border-primary/50"
-                        }`}
-                      >
-                        {selectedPackage === pkg.amount && (
-                          <div className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-                            <Check className="h-3 w-3 text-primary-foreground" />
+                    {ucPackages.map((pkg) => {
+                      const isSelected = selectedPackage === pkg.amount;
+                      return (
+                        <button
+                          key={pkg.amount}
+                          type="button"
+                          onClick={() => setSelectedPackage(pkg.amount)}
+                          className={`group flex overflow-hidden rounded-lg border-2 text-left transition-all ${
+                            isSelected
+                              ? "border-primary bg-primary/10"
+                              : "border-border bg-background hover:border-primary/50"
+                          }`}
+                        >
+                          <div className="flex-1 p-4">
+                            <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                              UC-{pkg.amount}
+                            </div>
+                            <div className="mt-1 font-display text-xl font-bold text-foreground">
+                              {pkg.amount} UC
+                            </div>
+                            <div className="mt-1 font-mono text-lg font-semibold text-primary">
+                              ${pkg.price.toFixed(2)}
+                            </div>
                           </div>
-                        )}
-                        <div className="text-xl font-bold text-foreground">{pkg.amount} UC</div>
-                        <div className="mt-1 text-lg font-semibold text-primary">
-                          ${pkg.price.toFixed(2)}
-                        </div>
-                        <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                          <Zap className="h-3 w-3" />
-                          Instant
-                        </div>
-                      </button>
-                    ))}
+                          <div
+                            className={`scratch-foil flex w-10 shrink-0 items-center justify-center border-l-2 border-dashed ${
+                              isSelected ? "border-primary bg-primary/20 text-primary" : "border-border text-muted-foreground"
+                            }`}
+                          >
+                            {isSelected ? <Check className="h-4 w-4" /> : <Zap className="h-4 w-4" />}
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>
@@ -203,7 +213,7 @@ export default function PubgPage() {
                   <CardTitle className="text-lg text-foreground">Payment Method</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     {paymentMethods.map((method) => (
                       <button
                         key={method.id}
@@ -215,8 +225,8 @@ export default function PubgPage() {
                             : "border-border bg-background hover:border-primary/50"
                         }`}
                       >
-                        <div className="text-2xl">{method.icon}</div>
-                        <div className="mt-2 text-sm font-medium text-foreground">{method.name}</div>
+                        <div className="font-mono text-sm font-semibold text-foreground">{method.name}</div>
+                        <div className="mt-1 text-xs text-muted-foreground">{method.hint}</div>
                       </button>
                     ))}
                   </div>
@@ -248,8 +258,8 @@ export default function PubgPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Payment</span>
-                      <span className="font-medium text-foreground capitalize">
-                        {paymentMethod || "—"}
+                      <span className="font-medium text-foreground">
+                        {paymentMethods.find((m) => m.id === paymentMethod)?.name || "—"}
                       </span>
                     </div>
                   </div>
@@ -264,7 +274,7 @@ export default function PubgPage() {
                   <Button
                     onClick={handleConfirmPayment}
                     disabled={!playerId || !selectedPackage || !paymentMethod || isProcessing}
-                    className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground transition-all hover:scale-105 hover:shadow-lg hover:shadow-primary/25 disabled:scale-100 disabled:opacity-50"
+                    className="w-full bg-primary text-primary-foreground transition-all hover:scale-105 hover:bg-primary/90 disabled:scale-100 disabled:opacity-50"
                   >
                     {isProcessing ? (
                       <>

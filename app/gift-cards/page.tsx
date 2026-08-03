@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, Gift, Loader2, Copy, Mail, ArrowLeft, Wallet, Landmark, Bitcoin } from "lucide-react";
+import { Check, Gift, Loader2, Copy, Mail, ArrowLeft } from "lucide-react";
 
 const giftCards = [
   { id: "google-play", name: "Google Play", color: "from-green-500 to-green-700", logo: "/gift-cards/googleplay.svg" },
@@ -27,9 +27,10 @@ const cardValues = [
 ];
 
 const paymentMethods = [
-  { id: "ewallet", name: "E-Wallet", hint: "Pay from your wallet balance", icon: Wallet },
-  { id: "bank", name: "Bank Transfer", hint: "Direct transfer from your bank", icon: Landmark },
-  { id: "crypto", name: "Crypto", hint: "Pay with cryptocurrency", icon: Bitcoin },
+  { id: "aba", name: "ABA PAY", hint: "Mobile app", logo: "/payment-methods/aba.png" },
+  { id: "wing", name: "Wing", hint: "Mobile money", logo: "/payment-methods/wing.png" },
+  { id: "khqr", name: "KHQR", hint: "Scan any bank", logo: "/payment-methods/khqr.png" },
+  { id: "truemoney", name: "TrueMoney", hint: "Wallet", logo: "/payment-methods/truemoney.png" },
 ];
 
 type Step = "list" | "detail" | "success";
@@ -253,8 +254,14 @@ export default function GiftCardsPage() {
                         >
                           {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
                         </span>
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                          <method.icon className="h-5 w-5" />
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-white p-2">
+                          <Image
+                            src={method.logo}
+                            alt={method.name}
+                            width={40}
+                            height={40}
+                            className="h-full w-full object-contain"
+                          />
                         </span>
                         <span className="flex-1">
                           <span className="block font-semibold text-foreground">{method.name}</span>

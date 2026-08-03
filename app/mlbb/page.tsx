@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Check, Loader2, Gem, Search, Smartphone, Wallet, QrCode, CreditCard } from "lucide-react";
+import { AlertCircle, Check, Loader2, Gem, Search } from "lucide-react";
 
 const diamondPackages = [
   { amount: 86, price: 1.49 },
@@ -20,10 +21,10 @@ const diamondPackages = [
 ];
 
 const paymentMethods = [
-  { id: "aba", name: "ABA PAY", hint: "Mobile app", icon: Smartphone },
-  { id: "wing", name: "Wing", hint: "Mobile money", icon: Wallet },
-  { id: "khqr", name: "KHQR", hint: "Scan any bank", icon: QrCode },
-  { id: "truemoney", name: "TrueMoney", hint: "Wallet", icon: CreditCard },
+  { id: "aba", name: "ABA PAY", hint: "Mobile app", logo: "/payment-methods/aba.png" },
+  { id: "wing", name: "Wing", hint: "Mobile money", logo: "/payment-methods/wing.png" },
+  { id: "khqr", name: "KHQR", hint: "Scan any bank", logo: "/payment-methods/khqr.png" },
+  { id: "truemoney", name: "TrueMoney", hint: "Wallet", logo: "/payment-methods/truemoney.png" },
 ];
 
 type Step = "select" | "payment" | "success";
@@ -313,8 +314,14 @@ export default function MlbbPage() {
                         >
                           {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
                         </span>
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                          <method.icon className="h-5 w-5" />
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-white p-2">
+                          <Image
+                            src={method.logo}
+                            alt={method.name}
+                            width={40}
+                            height={40}
+                            className="h-full w-full object-contain"
+                          />
                         </span>
                         <span className="flex-1">
                           <span className="block font-semibold text-foreground">{method.name}</span>

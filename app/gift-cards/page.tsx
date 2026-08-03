@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -11,11 +12,11 @@ import { Label } from "@/components/ui/label";
 import { Check, Gift, Loader2, Copy, Mail, ArrowLeft, Wallet, Landmark, Bitcoin } from "lucide-react";
 
 const giftCards = [
-  { id: "google-play", name: "Google Play", color: "from-green-500 to-green-700" },
-  { id: "apple", name: "Apple App Store", color: "from-gray-600 to-gray-800" },
-  { id: "steam", name: "Steam", color: "from-blue-600 to-blue-900" },
-  { id: "garena", name: "Garena", color: "from-orange-500 to-red-600" },
-  { id: "playstation", name: "PlayStation", color: "from-blue-500 to-blue-700" },
+  { id: "google-play", name: "Google Play", color: "from-green-500 to-green-700", logo: "/gift-cards/googleplay.svg" },
+  { id: "apple", name: "Apple App Store", color: "from-gray-600 to-gray-800", logo: "/gift-cards/apple.svg" },
+  { id: "steam", name: "Steam", color: "from-blue-600 to-blue-900", logo: "/gift-cards/steam.svg" },
+  { id: "garena", name: "Garena", color: "from-orange-500 to-red-600", logo: "/gift-cards/garena.png" },
+  { id: "playstation", name: "PlayStation", color: "from-blue-500 to-blue-700", logo: "/gift-cards/playstation.svg" },
 ];
 
 const cardValues = [
@@ -152,10 +153,17 @@ export default function GiftCardsPage() {
               {/* Left - Card Preview */}
               <div>
                 <Card className={`overflow-hidden border-0 bg-gradient-to-br ${currentCard.color}`}>
-                  <CardContent className="flex h-48 flex-col items-center justify-center p-6 text-white">
-                    <Gift className="mb-4 h-12 w-12" />
+                  <CardContent className="flex h-48 flex-col items-center justify-center gap-4 p-6 text-white">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white p-3 shadow-lg">
+                      <Image
+                        src={currentCard.logo}
+                        alt={currentCard.name}
+                        width={64}
+                        height={64}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
                     <h2 className="text-2xl font-bold">{currentCard.name}</h2>
-                    <p className="mt-2 text-white/80">Gift Card</p>
                   </CardContent>
                 </Card>
               </div>
@@ -341,7 +349,15 @@ export default function GiftCardsPage() {
               >
                 <div className={`h-32 bg-gradient-to-br ${card.color}`}>
                   <div className="flex h-full items-center justify-center">
-                    <Gift className="h-12 w-12 text-white/80 transition-transform group-hover:scale-110" />
+                    <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white p-2.5 shadow-lg transition-transform group-hover:scale-110">
+                      <Image
+                        src={card.logo}
+                        alt={card.name}
+                        width={48}
+                        height={48}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
                   </div>
                 </div>
                 <CardContent className="p-4">

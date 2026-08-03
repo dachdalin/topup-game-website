@@ -1,41 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+import { Header } from "@/components/global/header";
+import { Footer } from "@/components/global/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { AlertCircle, Check, Coins, Loader2, Search } from "lucide-react";
-
-const ucPackages = [
-  { amount: 60, price: 0.99 },
-  { amount: 120, price: 1.99 },
-  { amount: 300, price: 4.99 },
-  { amount: 600, price: 9.99, popular: true },
-  { amount: 1500, price: 24.99 },
-  { amount: 3000, price: 49.99 },
-];
-
-const paymentMethods = [
-  { id: "aba", name: "ABA PAY", hint: "Mobile app", logo: "/payment-methods/aba.png" },
-  { id: "wing", name: "Wing", hint: "Mobile money", logo: "/payment-methods/wing.png" },
-  { id: "khqr", name: "KHQR", hint: "Scan any bank", logo: "/payment-methods/khqr.png" },
-  { id: "truemoney", name: "TrueMoney", hint: "Wallet", logo: "/payment-methods/truemoney.png" },
-];
-
-type Step = "select" | "payment" | "success";
-type IdCheckStatus = "idle" | "checking" | "done" | "error";
+import { PackageGrid } from "@/components/global/package-grid";
+import { PaymentMethodSelector } from "@/components/global/payment-method-selector";
+import { TermsAgreementCheckbox } from "@/components/global/terms-agreement-checkbox";
+import { OrderSummaryCard } from "@/components/global/order-summary-card";
+import { CheckoutSuccessCard } from "@/components/global/checkout-success-card";
+import { PlayerInfoCard } from "@/components/pubg/player-info-card";
+import { ucPackages, paymentMethods } from "@/components/pubg/data";
+import type { Step, IdCheckStatus } from "@/components/pubg/types";
+import { Coins } from "lucide-react";
 
 export default function PubgPage() {
   const [playerId, setPlayerId] = useState("");
@@ -100,45 +78,15 @@ export default function PubgPage() {
       <div className="flex min-h-screen flex-col">
         <Header />
         <main className="flex flex-1 items-center justify-center px-4 py-16">
-          <Card className="w-full max-w-md border-border bg-card">
-            <CardContent className="flex flex-col items-center p-8 text-center">
-              <div className="stamp mb-6 border-success text-success">
-                <Check className="h-4 w-4" />
-                បង់ រួច · paid
-              </div>
-              <h2 className="mb-2 font-display text-2xl font-bold text-foreground">Order Received!</h2>
-              <p className="mb-6 text-muted-foreground">
-                Your {selectedPackage} UC will be delivered within 5-10 minutes.
-              </p>
-              <div className="mb-6 w-full rounded-lg bg-background p-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Player ID:</span>
-                  <span className="font-medium text-foreground">{playerId}</span>
-                </div>
-                <div className="mt-2 flex justify-between text-sm">
-                  <span className="text-muted-foreground">Amount:</span>
-                  <span className="font-medium text-foreground">{selectedPackage} UC</span>
-                </div>
-                <div className="mt-2 flex justify-between text-sm">
-                  <span className="text-muted-foreground">Total:</span>
-                  <span className="font-medium text-primary">${selectedPkg?.price.toFixed(2)}</span>
-                </div>
-              </div>
-              <p className="mb-6 text-sm text-muted-foreground">
-                Need help? Contact us on{" "}
-                <a href="https://t.me/gametopup" className="text-primary hover:underline">
-                  Telegram
-                </a>{" "}
-                or{" "}
-                <a href="https://wa.me/1234567890" className="text-primary hover:underline">
-                  WhatsApp
-                </a>
-              </p>
-              <Button onClick={handleReset} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                Make Another Purchase
-              </Button>
-            </CardContent>
-          </Card>
+          <CheckoutSuccessCard
+            message={`Your ${selectedPackage} UC will be delivered within 5-10 minutes.`}
+            rows={[
+              { label: "Player ID", value: playerId },
+              { label: "Amount", value: `${selectedPackage} UC` },
+            ]}
+            totalLabel={`$${selectedPkg?.price.toFixed(2)}`}
+            onReset={handleReset}
+          />
         </main>
         <Footer />
       </div>
@@ -160,269 +108,62 @@ export default function PubgPage() {
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Left Column - Form */}
             <div className="lg:col-span-2">
-              {/* Player Info */}
-              <Card className="mb-6 border-border bg-card">
-                <CardHeader>
-                  <CardTitle className="text-lg text-foreground">Player Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="playerId" className="text-foreground">Player ID</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="playerId"
-                        placeholder="Enter your Player ID"
-                        value={playerId}
-                        onChange={(e) => handlePlayerIdChange(e.target.value)}
-                        className="border-border bg-background text-foreground placeholder:text-muted-foreground"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleCheckPlayerId}
-                        disabled={!playerId.trim() || idCheckStatus === "checking"}
-                        className="shrink-0 border-accent text-accent hover:bg-accent/10 bg-transparent"
-                      >
-                        {idCheckStatus === "checking" ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Search className="h-4 w-4" />
-                        )}
-                        <span className="ml-2 hidden sm:inline">Check ID</span>
-                      </Button>
-                    </div>
+              <PlayerInfoCard
+                playerId={playerId}
+                onPlayerIdChange={handlePlayerIdChange}
+                server={server}
+                onServerChange={setServer}
+                idCheckStatus={idCheckStatus}
+                checkedNickname={checkedNickname}
+                onCheckPlayerId={handleCheckPlayerId}
+              />
 
-                    {idCheckStatus === "done" && checkedNickname && (
-                      <div className="rounded-lg border-2 border-accent/50 bg-accent/10 p-3">
-                        <p className="text-sm text-foreground">
-                          Account found: <span className="font-semibold">{checkedNickname}</span>
-                        </p>
-                        <p className="mt-1 flex items-center gap-1 text-xs text-accent">
-                          <AlertCircle className="h-3 w-3 shrink-0" />
-                          Preview lookup only — not yet verified against the live game server. Confirm your Player ID matches your in-game profile before paying.
-                        </p>
-                      </div>
-                    )}
-                    {idCheckStatus === "error" && (
-                      <p className="flex items-center gap-1 text-xs text-destructive">
-                        <AlertCircle className="h-3 w-3" />
-                        Could not check this ID right now. Double-check it manually before paying.
-                      </p>
-                    )}
-                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <AlertCircle className="h-3 w-3" />
-                      Double-check your Player ID before payment
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="server" className="text-foreground">Server</Label>
-                    <Select value={server} onValueChange={setServer}>
-                      <SelectTrigger className="border-border bg-background text-foreground">
-                        <SelectValue placeholder="Select server" />
-                      </SelectTrigger>
-                      <SelectContent className="border-border bg-card">
-                        <SelectItem value="global">Global</SelectItem>
-                        <SelectItem value="kr">Korea</SelectItem>
-                        <SelectItem value="vn">Vietnam</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* UC Packages */}
               <Card className="mb-6 border-border bg-card">
                 <CardHeader>
                   <CardTitle className="text-lg text-foreground">Select UC Package</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                    {ucPackages.map((pkg) => {
-                      const isSelected = selectedPackage === pkg.amount;
-                      return (
-                        <button
-                          key={pkg.amount}
-                          type="button"
-                          onClick={() => setSelectedPackage(pkg.amount)}
-                          className={`group relative flex flex-col items-center gap-1.5 rounded-xl border-2 p-4 pt-5 text-center shadow-md transition-all active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${
-                            isSelected
-                              ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
-                              : pkg.popular
-                                ? "border-accent/60 bg-background shadow-black/20 hover:-translate-y-0.5 hover:border-accent hover:shadow-lg"
-                                : "border-border bg-background shadow-black/20 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lg"
-                          }`}
-                        >
-                          {pkg.popular && !isSelected && (
-                            <span className="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rotate-[-2deg] whitespace-nowrap rounded-full bg-accent px-2.5 py-0.5 font-khmer text-[9px] tracking-wide text-accent-foreground shadow">
-                              ពេញនិយម · popular
-                            </span>
-                          )}
-                          {isSelected && (
-                            <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow">
-                              <Check className="h-3 w-3" />
-                            </span>
-                          )}
-                          <span
-                            className={`flex h-14 w-14 items-center justify-center rounded-full border-4 shadow-inner transition-colors ${
-                              isSelected ? "border-accent bg-accent/20" : "border-accent/50 bg-accent/10 group-hover:border-accent"
-                            }`}
-                          >
-                            <Coins className="h-7 w-7 text-accent" />
-                          </span>
-                          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                            UC-{pkg.amount}
-                          </div>
-                          <div className="font-display text-xl font-bold text-foreground">
-                            {pkg.amount} UC
-                          </div>
-                          <div className="font-mono text-lg font-semibold text-primary">
-                            ${pkg.price.toFixed(2)}
-                          </div>
-                          <div className="font-khmer text-[10px] tracking-wide text-muted-foreground">
-                            ភ្លាមៗ · instant
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <PackageGrid
+                    packages={ucPackages}
+                    selectedAmount={selectedPackage}
+                    onSelect={setSelectedPackage}
+                    icon={Coins}
+                    idPrefix="UC"
+                    unitLabel="UC"
+                    size="lg"
+                  />
                 </CardContent>
               </Card>
 
-              {/* Payment Method */}
               <Card className="border-border bg-card">
                 <CardHeader>
                   <CardTitle className="text-lg text-foreground">Payment Method</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {paymentMethods.map((method) => {
-                    const isSelected = paymentMethod === method.id;
-                    return (
-                      <button
-                        key={method.id}
-                        type="button"
-                        onClick={() => setPaymentMethod(method.id)}
-                        className={`flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left transition-all ${
-                          isSelected
-                            ? "border-primary bg-primary/10"
-                            : "border-border bg-background hover:border-primary/50"
-                        }`}
-                      >
-                        <span
-                          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                            isSelected ? "border-primary" : "border-border"
-                          }`}
-                        >
-                          {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
-                        </span>
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-white p-2">
-                          <Image
-                            src={method.logo}
-                            alt={method.name}
-                            width={40}
-                            height={40}
-                            className="h-full w-full object-contain"
-                          />
-                        </span>
-                        <span className="flex-1">
-                          <span className="block font-semibold text-foreground">{method.name}</span>
-                          <span className="block text-sm text-muted-foreground">{method.hint}</span>
-                        </span>
-                      </button>
-                    );
-                  })}
-
-                  <div
-                    role="checkbox"
-                    aria-checked={agreedToTerms}
-                    tabIndex={0}
-                    onClick={() => setAgreedToTerms((v) => !v)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setAgreedToTerms((v) => !v);
-                      }
-                    }}
-                    className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-all ${
-                      agreedToTerms
-                        ? "border-primary bg-primary/10"
-                        : "border-border bg-background hover:border-primary/50"
-                    }`}
-                  >
-                    <span
-                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                        agreedToTerms ? "border-primary" : "border-border"
-                      }`}
-                    >
-                      {agreedToTerms && <span className="h-2.5 w-2.5 rounded-full bg-primary" />}
-                    </span>
-                    <span className="text-sm text-foreground">
-                      I have read and agree to the{" "}
-                      <Link
-                        href="/terms"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-primary underline"
-                      >
-                        Terms & Conditions
-                      </Link>
-                    </span>
-                  </div>
+                  <PaymentMethodSelector
+                    methods={paymentMethods}
+                    selected={paymentMethod}
+                    onSelect={setPaymentMethod}
+                  />
+                  <TermsAgreementCheckbox checked={agreedToTerms} onChange={setAgreedToTerms} />
                 </CardContent>
               </Card>
             </div>
 
             {/* Right Column - Order Summary */}
             <div>
-              <Card className="sticky top-24 border-border bg-card">
-                <CardHeader>
-                  <CardTitle className="text-lg text-foreground">Order Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Player ID</span>
-                      <span className="font-medium text-foreground">{playerId || "—"}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Server</span>
-                      <span className="font-medium text-foreground capitalize">{server}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">UC Amount</span>
-                      <span className="font-medium text-foreground">
-                        {selectedPackage ? `${selectedPackage} UC` : "—"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Payment</span>
-                      <span className="font-medium text-foreground">
-                        {paymentMethods.find((m) => m.id === paymentMethod)?.name || "—"}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="border-t border-border pt-4">
-                    <div className="flex justify-between text-lg font-bold">
-                      <span className="text-foreground">Total</span>
-                      <span className="text-primary">
-                        {selectedPkg ? `$${selectedPkg.price.toFixed(2)}` : "$0.00"}
-                      </span>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={handleConfirmPayment}
-                    disabled={!playerId || !selectedPackage || !paymentMethod || !agreedToTerms || isProcessing}
-                    className="w-full bg-primary text-primary-foreground transition-all hover:scale-105 hover:bg-primary/90 disabled:scale-100 disabled:opacity-50"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      "Confirm & Pay"
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
+              <OrderSummaryCard
+                rows={[
+                  { label: "Player ID", value: playerId || "—" },
+                  { label: "Server", value: server.charAt(0).toUpperCase() + server.slice(1) },
+                  { label: "UC Amount", value: selectedPackage ? `${selectedPackage} UC` : "—" },
+                  { label: "Payment", value: paymentMethods.find((m) => m.id === paymentMethod)?.name || "—" },
+                ]}
+                totalLabel={selectedPkg ? `$${selectedPkg.price.toFixed(2)}` : "$0.00"}
+                onConfirm={handleConfirmPayment}
+                confirmDisabled={!playerId || !selectedPackage || !paymentMethod || !agreedToTerms}
+                isProcessing={isProcessing}
+              />
             </div>
           </div>
         </div>
